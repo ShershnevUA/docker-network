@@ -1,0 +1,41 @@
+version: '3'
+services:
+  ### PHP-FPM Container
+  php-fpm:
+    build: ./build/php-fpm
+    volumes:
+      - ./src:/var/www
+    expose:
+      - "9000"
+  
+  ### NGINX Container
+  nginx:
+    build: ./build/nginx
+    volumes:
+      - ./logs/nginx/:/var/log/nginx
+      - ./src:/var/www
+    ports:
+      - "8081:80"
+    links:
+      - php-fpm
+
+
+  ### Application Code Container
+  application:
+    build: ./build/application
+
+
+  ### Workspace Utilities Container
+  workspace:
+    build: ./build/workspace
+    volumes:
+      - ./src:/var/www
+    tty: true
+
+volumes:
+  src:
+
+networks:
+  default:
+    external:
+      name: docker-network
